@@ -41,7 +41,7 @@ mergeInto(LibraryManager.library, {
 
     fs_export_file: function(filename, buf, buf_len)
     {
-        var _filename = Pointer_stringify(filename);
+        var _filename = UTF8ToString(filename);
 //        console.log("exporting " + _filename);
         var data = HEAPU8.subarray(buf, buf + buf_len);
         var file = new Blob([data], { type: "application/octet-stream" });
@@ -59,19 +59,19 @@ mergeInto(LibraryManager.library, {
     },
 
     emscripten_async_wget3_data: function(url, request, user, password, post_data, post_data_len, arg, free, onload, onerror, onprogress) {
-    var _url = Pointer_stringify(url);
-    var _request = Pointer_stringify(request);
+    var _url = UTF8ToString(url);
+    var _request = UTF8ToString(request);
     var _user;
     var _password;
 
       var http = new XMLHttpRequest();
 
       if (user)
-          _user = Pointer_stringify(user);
+          _user = UTF8ToString(user);
       else
           _user = null;
       if (password)
-          _password = Pointer_stringify(password);
+          _password = UTF8ToString(password);
       else
           _password = null;
         
