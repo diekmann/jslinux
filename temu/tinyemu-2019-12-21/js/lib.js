@@ -89,10 +89,10 @@ mergeInto(LibraryManager.library, {
         var byteArray = new Uint8Array(http.response);
         var buffer = _malloc(byteArray.length);
         HEAPU8.set(byteArray, buffer);
-        if (onload) Runtime.dynCall('viiii', onload, [handle, arg, buffer, byteArray.length]);
+        if (onload) dynCall('viiii', onload, [handle, arg, buffer, byteArray.length]);
         if (free) _free(buffer);
       } else {
-        if (onerror) Runtime.dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
+        if (onerror) dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
       }
       delete Browser.wgetRequests[handle];
     };
@@ -100,14 +100,14 @@ mergeInto(LibraryManager.library, {
     // ERROR
     http.onerror = function http_onerror(e) {
       if (onerror) {
-        Runtime.dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
+        dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
       }
       delete Browser.wgetRequests[handle];
     };
 
     // PROGRESS
     http.onprogress = function http_onprogress(e) {
-      if (onprogress) Runtime.dynCall('viiii', onprogress, [handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0]);
+      if (onprogress) dynCall('viiii', onprogress, [handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0]);
     };
 
     // ABORT
