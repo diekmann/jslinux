@@ -588,18 +588,7 @@ function start_vm(user, pwd)
         /* wasm support : the memory grows automatically */
         vm_url = vm_file + "-wasm.js";
     } else {
-        /* set the total memory */
-        alloc_size = mem_size;
-        if (cpu == "x86")
-            alloc_size += 16;
-        if (graphic_enable) {
-            /* frame buffer memory */
-            alloc_size += (width * height * 4 + 1048576 - 1) >> 20;
-        }
-        alloc_size += 32; /* extra space (XXX: reduce it ?) */
-        alloc_size = (alloc_size + 15) & -16; /* align to 16 MB */
-        Module.TOTAL_MEMORY = alloc_size << 20;
-        vm_url = vm_file + ".js";
+        console.error("no wasm supported");
     }
     Module.preRun = start;
 
