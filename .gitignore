@@ -1,0 +1,7 @@
+temu/tinyemu-2019-12-21/*.d
+temu/tinyemu-2019-12-21/*.js.d
+temu/tinyemu-2019-12-21/*.js.o
+temu/tinyemu-2019-12-21/js/riscvemu32-wasm.js
+temu/tinyemu-2019-12-21/js/riscvemu32-wasm.wasm
+temu/tinyemu-2019-12-21/js/riscvemu64-wasm.js
+temu/tinyemu-2019-12-21/js/riscvemu64-wasm.wasm
