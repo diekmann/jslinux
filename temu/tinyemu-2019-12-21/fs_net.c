@@ -2875,9 +2875,10 @@ void fs_import_file(const char *filename, uint8_t *buf, int buf_len)
     FSFile *fd, *root_fd;
     FSQID qid;
     
-    //    printf("importing file: %s len=%d\n", filename, buf_len);
+    printf("importing file: %s len=%d\n", filename, buf_len);
     fs = fs_import_fs;
     if (!fs) {
+        printf("importing file failed because fs_import_fs is not defined\n");
         free(buf);
         return;
     }
@@ -2885,13 +2886,17 @@ void fs_import_file(const char *filename, uint8_t *buf, int buf_len)
     assert(!fs->fs_attach(fs, &root_fd, &qid, 1000, "", ""));
     fs1 = (FSDeviceMem *)fs;
     fd = fs_walk_path(fs, root_fd, fs1->import_dir);
-    if (!fd)
+    if (!fd) {
+        printf("importing file failed because fs_walk_path returned no fd\n");
         goto fail;
+    }
     fs_unlinkat(fs, root_fd, filename);
-    if (fs->fs_create(fs, &qid, fd, filename, P9_O_RDWR | P9_O_TRUNC,
-                      0600, 0) < 0)
+    if (fs->fs_create(fs, &qid, fd, filename, P9_O_RDWR | P9_O_TRUNC, 0600, 0) < 0) {
+        printf("importing file failed because fs->fs_create returned an error\n");
         goto fail;
-    fs->fs_write(fs, fd, 0, buf, buf_len);
+    }
+    int ret = fs->fs_write(fs, fd, 0, buf, buf_len);
+    printf("importing file ffs->fs_write returned %d\n", ret);
  fail:
     if (fd)
         fs->fs_delete(fs, fd);
