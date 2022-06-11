@@ -2,12 +2,11 @@
 all:
 	# Assumes rootless docker
 	
-	# emscripten 1.38.27 removes Pointer_stringify (use UTF8ToString instead)
+	# looks like this was originally compiled emscripten older than 1.38.27, since this version removes Pointer_stringify, which was used in the js/lib.js.
 	# only emscripten starting at 1.39.0 is found on dockerhub, I could not find older images.
-	# also compiles with 1.40.1
-	# does compile with 3.1.13 or 2.0.34 but VM does not start
-	# there is the reason why it like no longer compiles: https://github.com/emscripten-core/emscripten/commit/e76237b6eef44ecf6e1d8aeb656e8e781251ac21
-	docker run --rm -it -v /home/corny/git/jslinux/temu/tinyemu-2019-12-21:/temu --workdir /temu emscripten/emsdk:1.40.1 make --makefile=Makefile.js
+	# I made itr compile and start with 2.0.34. There are no integration tests, so no idea if this is stable.
+	# TODO: compile with 3.1.13 or newer
+	docker run --rm -it -v /home/corny/git/jslinux/temu/tinyemu-2019-12-21:/temu --workdir /temu emscripten/emsdk:2.0.34 make --makefile=Makefile.js
 
 gh-pages: all
 	mkdir -p ./public

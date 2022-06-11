@@ -58,6 +58,11 @@ mergeInto(LibraryManager.library, {
         }, 50);
     },
 
+
+    // This looks very much like /emsdk/upstream/emscripten/src/library_wget.js emscripten_async_wget2_data
+    emscripten_async_wget3_data__deps: ['$wget', 'malloc', 'free'],
+    emscripten_async_wget3_data__proxy: 'sync',
+    emscripten_async_wget3_data__sig: 'iiiiiiiiiiii',
     emscripten_async_wget3_data: function(url, request, user, password, post_data, post_data_len, arg, free, onload, onerror, onprogress) {
     var _url = UTF8ToString(url);
     var _request = UTF8ToString(request);
@@ -81,39 +86,50 @@ mergeInto(LibraryManager.library, {
           http.setRequestHeader("Authorization", "Basic " + btoa(_user + ':' + _password));
       }
         
-    var handle = Browser.getNextWgetRequestHandle();
+    var handle = wget.getNextWgetRequestHandle();
+
+    function onerrorjs() {
+      if (onerror) {
+        var statusText = 0;
+        if (http.statusText) {
+          var len = lengthBytesUTF8(http.statusText) + 1;
+          statusText = stackAlloc(len);
+          stringToUTF8(http.statusText, statusText, len);
+        }
+        {{{ makeDynCall('viiii', 'onerror') }}}(handle, arg, http.status, statusText);
+      }
+    }
 
     // LOAD
     http.onload = function http_onload(e) {
-      if (http.status == 200 || _url.substr(0,4).toLowerCase() != "http") {
-        var byteArray = new Uint8Array(http.response);
+      if (http.status >= 200 && http.status < 300 || (http.status === 0 && _url.substr(0,4).toLowerCase() != "http")) {
+        var byteArray = new Uint8Array(/** @type{ArrayBuffer} */(http.response));
         var buffer = _malloc(byteArray.length);
         HEAPU8.set(byteArray, buffer);
-        if (onload) dynCall('viiii', onload, [handle, arg, buffer, byteArray.length]);
+        if (onload) {{{ makeDynCall('viiii', 'onload') }}}(handle, arg, buffer, byteArray.length);
         if (free) _free(buffer);
       } else {
-        if (onerror) dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
+        onerrorjs();
       }
-      delete Browser.wgetRequests[handle];
+      delete wget.wgetRequests[handle];
     };
 
     // ERROR
     http.onerror = function http_onerror(e) {
-      if (onerror) {
-        dynCall('viiii', onerror, [handle, arg, http.status, http.statusText]);
-      }
-      delete Browser.wgetRequests[handle];
+      onerrorjs();
+      delete wget.wgetRequests[handle];
     };
 
     // PROGRESS
     http.onprogress = function http_onprogress(e) {
-      if (onprogress) dynCall('viiii', onprogress, [handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0]);
+      if (onprogress) {{{ makeDynCall('viiii', 'onprogress') }}}(handle, arg, e.loaded, e.lengthComputable || e.lengthComputable === undefined ? e.total : 0);
     };
 
     // ABORT
     http.onabort = function http_onabort(e) {
-      delete Browser.wgetRequests[handle];
+      delete wget.wgetRequests[handle];
     };
+
 
     // Useful because the browser can limit the number of redirection
     try {
@@ -132,7 +148,7 @@ mergeInto(LibraryManager.library, {
       http.send(null);
     }
 
-    Browser.wgetRequests[handle] = http;
+    wget.wgetRequests[handle] = http;
 
     return handle;
   },
