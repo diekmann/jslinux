@@ -19,6 +19,8 @@ gh-pages: all
 	cp jslinux/jslinux-2019-12-21/kernel-riscv64.bin ./public
 	cp -r jslinux/jslinux-2019-12-21/root-riscv64 ./public
 	
+	cp -ar vmimages ./public # http://127.0.0.1:8001/?url=vmimages/bellard.org/buildroot-riscv64/buildroot-riscv64.cfg
+	
 	cp temu/tinyemu-2019-12-21/js/riscvemu* ./public
 
 clean:

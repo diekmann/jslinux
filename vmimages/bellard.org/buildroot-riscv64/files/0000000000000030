@@ -1,0 +1,19 @@
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+
+if [ "$PS1" ]; then
+# works for bash and ash (no other shells known to be in use here)
+   PS1='[\u@\h \W]\$ '
+fi
+export PS1
+
+export PAGER='/bin/more '
+export EDITOR='/bin/vi'
+unset HISTFILE
+
+# Source configuration files from /etc/profile.d
+for i in /etc/profile.d/*.sh ; do
+	if [ -r "$i" ]; then
+		. $i
+	fi
+	unset i
+done
