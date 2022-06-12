@@ -431,6 +431,7 @@ function Ethernet(url)
 
 Ethernet.prototype.openHandler = function(e)
 {
+    console.log("web socket ready", e);
     net_set_carrier(1);
 }
 
@@ -441,7 +442,7 @@ Ethernet.prototype.closeHandler = function(e)
 
 Ethernet.prototype.errorHandler = function(e)
 {
-    console.log("Websocket error=" + e);
+    console.log("Websocket error=", e);
 }
 
 Ethernet.prototype.messageHandler = function(e)
