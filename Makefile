@@ -1,13 +1,13 @@
 
-all:
-	# Assumes rootless docker
-	
+# Assumes rootless docker
+
+temu: $(shell find temu -type f)
 	# looks like this was originally compiled emscripten older than 1.38.27, since this version removes Pointer_stringify, which was used in the js/lib.js.
 	# only emscripten starting at 1.39.0 is found on dockerhub, I could not find older images.
 	# I made it compile and start with 2.0.34. There are no integration tests, so no idea if this is stable.
 	docker run --rm -it -v /home/corny/git/jslinux/temu/tinyemu-2019-12-21:/temu --workdir /temu emscripten/emsdk:3.1.13 make --makefile=Makefile.js
 
-gh-pages: all
+gh-pages: temu $(shell find jslinux -type f) $(shell find vmimages -type f)
 	mkdir -p ./public
 	cp jslinux/jslinux-2019-12-21/index.html ./public
 	cp jslinux/jslinux-2019-12-21/jslinux.js ./public
