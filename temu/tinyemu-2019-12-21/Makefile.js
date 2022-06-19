@@ -29,28 +29,31 @@ EMCFLAGS=-O2 -Wall -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -MMD -fno-strict-a
 EMLDFLAGS=-O3 --memory-init-file 0 --closure 0 -s NO_EXIT_RUNTIME=1 -s DYNCALLS=1 -s NO_FILESYSTEM=1 -s "EXPORTED_FUNCTIONS=['_console_queue_char','_vm_start','_fs_import_file','_display_key_event','_display_mouse_event','_display_wheel_event','_net_write_packet','_net_set_carrier', '_free']" -s 'EXPORTED_RUNTIME_METHODS=["ccall", "cwrap"]' --js-library js/lib.js
 EMLDFLAGS_WASM:=$(EMLDFLAGS) -s WASM=1 -s TOTAL_MEMORY=67108864 -s ALLOW_MEMORY_GROWTH=1
 
-PROGS=js/riscvemu64-wasm.js
+PROGS=js/riscvemu64-wasm.js js/x86emu-wasm.js
 
 all: $(PROGS)
 
 JS_OBJS=jsemu.js.o softfp.js.o virtio.js.o fs.js.o fs_net.js.o fs_wget.js.o fs_utils.js.o simplefb.js.o pci.js.o json.js.o block_net.js.o
 JS_OBJS+=iomem.js.o cutils.js.o aes.js.o sha256.js.o
 
-RISCVEMU64_OBJS=$(JS_OBJS) riscv_cpu64.js.o riscv_machine.js.o machine.js.o
-RISCVEMU32_OBJS=$(JS_OBJS) riscv_cpu32.js.o riscv_machine.js.o machine.js.o
+RISCVEMU64_OBJS=$(JS_OBJS) riscv_cpu64.js.o riscv_machine.js.o wasm_riscv64_machine.js.o
+
+X86_OBJS=$(JS_OBJS) x86_cpu.js.o x86_machine.js.o wasm_x86_machine.js.o ide.js.o ps2.js.o vmmouse.js.o pckbd.js.o vga.js.o
 
 js/riscvemu64-wasm.js: $(RISCVEMU64_OBJS) js/lib.js
 	$(EMCC) $(EMLDFLAGS_WASM) -o $@ $(RISCVEMU64_OBJS)
 
-js/riscvemu32-wasm.js: $(RISCVEMU32_OBJS) js/lib.js
-	$(EMCC) $(EMLDFLAGS_WASM) -o $@ $(RISCVEMU32_OBJS)
-
-riscv_cpu32.js.o: riscv_cpu.c
-	$(EMCC) $(EMCFLAGS) -DMAX_XLEN=32 -DCONFIG_RISCV_MAX_XLEN=32 -c -o $@ $<
-
 riscv_cpu64.js.o: riscv_cpu.c
 	$(EMCC) $(EMCFLAGS) -DMAX_XLEN=64 -DCONFIG_RISCV_MAX_XLEN=64 -c -o $@ $<
 
+wasm_riscv64_machine.js.o: machine.c
+	$(EMCC) $(EMCFLAGS) -DMAX_XLEN=64 -DCONFIG_RISCV_MAX_XLEN=64 -c -o $@ $<
+
+js/x86emu-wasm.js: $(X86_OBJS) js/lib.js
+	$(EMCC) $(EMLDFLAGS_WASM) -o $@ $(X86_OBJS)
+
+wasm_x86_machine.js.o: machine.c
+	$(EMCC) $(EMCFLAGS) -DCONFIG_X86EMU -c -o $@ $<
 
 %.js.o: %.c
 	$(EMCC) $(EMCFLAGS) -c -o $@ $<

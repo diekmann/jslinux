@@ -5,3 +5,5 @@ temu/tinyemu-2019-12-21/js/riscvemu32-wasm.js
 temu/tinyemu-2019-12-21/js/riscvemu32-wasm.wasm
 temu/tinyemu-2019-12-21/js/riscvemu64-wasm.js
 temu/tinyemu-2019-12-21/js/riscvemu64-wasm.wasm
+temu/tinyemu-2019-12-21/js/x86-wasm.js
+temu/tinyemu-2019-12-21/js/x86-wasm.wasm
